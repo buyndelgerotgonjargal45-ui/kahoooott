@@ -20,6 +20,7 @@ const Page = () => {
 
         }
     ])
+    const [quizName, setquizName] = useState("")
 
 
 
@@ -31,12 +32,38 @@ const Page = () => {
             options: ["", "", "", ""],
         }])
     }
+    const createQuiz = async () => {
+        // console.log(quizName)
+        // console.log(questionsOption)
+       const response = await supabase.from("quiz").insert({
+            name: quizName
+        }).select("*");
+        console.log(response, "create-quiz response ------")
+    }
 
     const updateQuestion = (qIndex, field, value) => {
-        const a = questionsOption.map((question, index) => {
+        const uptadeQuestions = questionsOption.map((question, index) => {
             return index === qIndex ? { ...question, [field]: value } : question
         })
-        setQuestions(a)
+        setQuestionsOption(uptadeQuestions)
+
+    }
+    console.log(questionsOption)
+
+    const updateOptions = (qIndex, oIndex, value) => {
+        const updated = questionsOption.map((q, index) => {
+            if(index === qIndex) {
+                const newOptions = q.options.map((o, index) => {
+                    return index === oIndex ? value: o
+                })
+                return {
+                    ...q, options: newOptions,
+                } 
+            }else {
+                return q;
+            }
+        })
+        setQuestionsOption(updated)
 
     }
 
@@ -51,6 +78,9 @@ const Page = () => {
                 <label className="text-sm font-medium">Quiz name</label>
                 <Input
                     placeholder="My first quiz"
+                    value={quizName}
+                    onChange={(e) => setquizName(e.target.value)}
+
                 />
             </div>
 
@@ -58,7 +88,7 @@ const Page = () => {
                 <div key={qIndex} className="space-y-4 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-medium">Question {qIndex + 1}</h2>
-                        {questionsOption.length > 1 && (
+                        {/* {questionsOption.length > 1 && (
                             <Button
                                 variant="destructive"
                                 size="sm"
@@ -66,7 +96,7 @@ const Page = () => {
                             >
                                 Remove
                             </Button>
-                        )}
+                        )} */}
                     </div>
 
                     <Input
@@ -101,6 +131,7 @@ const Page = () => {
                                 <Input
                                     placeholder={`Option ${oIndex + 1}`}
                                     value={option}
+                                    onChange= {(e) => updateOptions(qIndex, oIndex, e.target.value)}
                                 />
                             </div>
                         ))}
@@ -112,6 +143,9 @@ const Page = () => {
                 <Button variant="outline" onClick={addQuestions}>
                     Add question
                 </Button>
+                <Button variant="outline" onClick={createQuiz}>
+                    Create quiz
+                </Button>
             </div>
 
         </div>
@@ -121,6 +155,6 @@ const Page = () => {
 
 
 }
-export default Page
+export default Page;
 
 

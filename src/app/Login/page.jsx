@@ -5,28 +5,34 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 
 const LoginPage = () => {
-    const supabase = supabaseClient(
-
-    );
+    const supabase = supabaseClient();
+    
     const router = useRouter();
     const signIn = async () => {
         const response = await supabase.auth.signUp({
             email: "otgoo@gmail.com",
             password: "otgoo0099",
         })
-        console.log(response)
+        console.log(response, "sign up response ---")
+        await supabase.from("users").insert({
+          authId: response.data.user.id,
+          username: username
+        })
     }
+    
 
-    const LogIN = async()=> {
+     const LogIN = async()=> {
         const response = await supabase.auth.signInWithPassword({
             email: "otgoo@gmail.com",
             password: "otgoo0099",
         })
-        if(response.data.token) {
-            alert("success")
-        }else{
+        if(response.data.user !== null) {
             router.push("/")
+        }else{
+            alert("burtglgui")
         }
+
+        console.log(response, "log in response----")
     }
 
     return (
