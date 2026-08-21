@@ -3,11 +3,13 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { supabaseClient } from "@/lib/supabase-client"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 
 
 const Page = () => {
     const supabase = supabaseClient();
+      const router = useRouter();
 
 
     const [questions, setQuestions] = useState("")
@@ -32,14 +34,7 @@ const Page = () => {
             options: ["", "", "", ""],
         }])
     }
-    const createQuiz = async () => {
-        // console.log(quizName)
-        // console.log(questionsOption)
-       const response = await supabase.from("quiz").insert({
-            name: quizName
-        }).select("*");
-        console.log(response, "create-quiz response ------")
-    }
+  
 
     const updateQuestion = (qIndex, field, value) => {
         const uptadeQuestions = questionsOption.map((question, index) => {
@@ -64,7 +59,42 @@ const Page = () => {
             }
         })
         setQuestionsOption(updated)
+    }
 
+    const createQuiz = async () => {
+        // console.log(quizName)
+        // console.log(questionsOption)
+       const response = await supabase.from("quiz").insert({
+            name: quizName
+        }).select("*");
+        console.log(response, "create-quiz response ------")
+        const quizId = response.data[0].id
+
+        for (let i = 0; i < questionsOption.length; i++) {
+            const response = await supabase.from("quizQuestions").insert({
+                quizId: quizId,
+                question: questionsOption[i].question,
+                questionOrder: i + 1,
+                point: questionsOption[i].point
+
+             
+            }).select("*")
+            console.log(response, "ques res")
+            const questionId = response.data[0].id
+
+            for (let j = 0; j < questionsOption[i].options.length; j++) {
+                const response = await supabase.from("questionOptions").insert({
+                    questionId: questionId,
+                    option: questionsOption[i].correctIndex === j
+                }).select("*")
+                console.log(response, "options response")
+            }
+        }
+ if(response.data !== null) {
+            router.push("/get-quiz")
+        }else{
+            alert("again")
+        }
     }
 
 
