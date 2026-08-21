@@ -85,7 +85,8 @@ const Page = () => {
             for (let j = 0; j < questionsOption[i].options.length; j++) {
                 const response = await supabase.from("questionOptions").insert({
                     questionId: questionId,
-                    option: questionsOption[i].correctIndex === j
+                    option: questionsOption[i].options[j],
+                    isCorrect: questionsOption[i].correctIndex === j
                 }).select("*")
                 console.log(response, "options response")
             }
